@@ -13,8 +13,9 @@ exports.create = (text, callback) => {
       console.log(err);
     } else {
       items[id] = text;
-      callback(null, { id, text });
-
+      fs.writeFile(`${exports.dataDir}/${id}.txt`, text, (err) => {
+        callback(err, { id, text });
+      });
     }
   });
 };
