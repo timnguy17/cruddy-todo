@@ -36,17 +36,16 @@ const writeCounter = (count, callback) => {
   });
 };
 
-// Public API - Fix this function //////////////////////////////////////////////
+// Public API
 
-//read counter
 exports.getNextUniqueId = (callback) => {
   readCounter((err, counter) => {
     if (err) {
-      console.log(err);
+      console.log('error reading counter');
     } else {
       writeCounter(counter + 1, (err, zeroPadNum) => {
         if (err) {
-          console.log(err);
+          console.log('error writing counter');
         } else {
           callback(null, zeroPadNum);
         }
@@ -54,8 +53,6 @@ exports.getNextUniqueId = (callback) => {
     }
   });
 };
-
-
 
 // Configuration -- DO NOT MODIFY //////////////////////////////////////////////
 

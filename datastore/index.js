@@ -10,7 +10,7 @@ var items = {};
 exports.create = (text, callback) => {
   counter.getNextUniqueId((err, id) => {
     if (err) {
-      console.log(err);
+      console.log('error getting unique ID');
     } else {
       items[id] = text;
       fs.writeFile(`${exports.dataDir}/${id}.txt`, text, (err) => {
@@ -20,11 +20,27 @@ exports.create = (text, callback) => {
   });
 };
 
+/*
+Next, refactor the readAll function by returning an array of todos to client app whenever a GET request to the collection route occurs. To do this, you will need to read the dataDir directory and build a list of files. Remember, the id of each todo item is encoded in its filename.
+
+VERY IMPORTANT: at this point in the basic requirements, do not attempt to read the contents of each file that contains the todo item text. Failing to heed this instruction has the potential to send you down a rabbit hole.
+
+Please note, however, you must still include a text field in your response to the client, and it's recommended that you use the message's id (that you identified from the filename) for both the id field and the text field. Doing so will have the effect of changing the presentation of your todo items for the time being; we'll address this issue shortly.
+*/
 exports.readAll = (callback) => {
-  var data = _.map(items, (text, id) => {
-    return { id, text };
+  var listOfFiles = [];
+
+  fs.readdir(exports.dataDir, (err, files) => {
+    if (err) {
+      console.log('error reading all files');
+    } else {
+      _.map(files, (file) => {
+        let split = file.split('.');
+        listOfFiles.push({ id: `${split[0]}`, text: `${split[0]}`});
+      });
+      callback(err, listOfFiles);
+    }
   });
-  callback(null, data);
 };
 
 exports.readOne = (id, callback) => {
@@ -58,7 +74,6 @@ exports.delete = (id, callback) => {
 };
 
 // Config+Initialization code -- DO NOT MODIFY /////////////////////////////////
-
 exports.dataDir = path.join(__dirname, 'data');
 
 exports.initialize = () => {
