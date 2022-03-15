@@ -20,13 +20,6 @@ exports.create = (text, callback) => {
   });
 };
 
-/*
-Next, refactor the readAll function by returning an array of todos to client app whenever a GET request to the collection route occurs. To do this, you will need to read the dataDir directory and build a list of files. Remember, the id of each todo item is encoded in its filename.
-
-VERY IMPORTANT: at this point in the basic requirements, do not attempt to read the contents of each file that contains the todo item text. Failing to heed this instruction has the potential to send you down a rabbit hole.
-
-Please note, however, you must still include a text field in your response to the client, and it's recommended that you use the message's id (that you identified from the filename) for both the id field and the text field. Doing so will have the effect of changing the presentation of your todo items for the time being; we'll address this issue shortly.
-*/
 exports.readAll = (callback) => {
   var listOfFiles = [];
 
@@ -45,30 +38,36 @@ exports.readAll = (callback) => {
 
 exports.readOne = (id, callback) => {
   fs.readFile(`${exports.dataDir}/${id}.txt`, 'utf8', (err, data) => {
-    console.log(data);
     if (err) {
       callback(`No item with id: ${id}`);
     } else {
       callback(err, { id: id, text: data});
     }
   });
-
-  // var text = items[id];
-  // if (!text) {
-  //   callback(new Error(`No item with id: ${id}`));
-  // } else {
-  //   callback(null, { id, text });
-  // }
 };
 
 exports.update = (id, text, callback) => {
-  var item = items[id];
-  if (!item) {
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    items[id] = text;
-    callback(null, { id, text });
-  }
+  fs.readFile(`${exports.dataDir}/${id}.txt`, (err, data) => {
+    if (err) {
+      callback(new Error(`No item with id: ${id}`));
+    } else {
+      fs.writeFile(`${exports.dataDir}/${id}.txt`, text, (err) => {
+        if (err) {
+          callback(err);
+        } else {
+          callback(err, { id: id, text: text});
+        }
+      });
+    }
+  });
+
+  // var item = items[id];
+  // if (!item) {
+  //   callback(new Error(`No item with id: ${id}`));
+  // } else {
+  //   items[id] = text;
+  //   callback(null, { id, text });
+  // }
 };
 
 exports.delete = (id, callback) => {
